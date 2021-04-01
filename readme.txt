@@ -12,7 +12,10 @@ Mechanic Visitor Counter is a widgets which will display the Visitor counter and
 
 Mechanic Visitor Counter is a widgets which will display the Visitor counter and traffic statistics on WordPress.Some of the features offered include Today Visitor, Today Hits, Total Hits, Total Visit, Who's Online and IP Address Visitors.
 
-Upload and Install WordPress Visitor Counter Plugins, Activate and Drag the Widgets in to your WordPress Sidebar. And this plugins will useless for a thousands of websites. If you were here, download and install it, you’ll like it.
+Upload and Install WordPress Visitor Counter Plugins, Activate and Drag the Widgets in to your WordPress Sidebar. And this plugins will useless for a thousands of websites. If you were here, download and install it, youâ€™ll like it.
+
+Shortcode Using: https://www.adityasubawa.com/mechanic-visitor-counter
+Upload your own image counter style: https://www.adityasubawa.com/how-to-upload-your-own-counter-style-to-the-mechanic-visitor-counter
 
 
 == Installation ==
