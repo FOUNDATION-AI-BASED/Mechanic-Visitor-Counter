@@ -43,7 +43,12 @@ $wpdb->query($sql);
 
 function acak($path, $exclude = ".|..|.svn|.DS_Store", $recursive = true) {
     $path = rtrim($path, "/") . "/";
-    $folder_handle = opendir($path) or die("Eof");
+    $folder_handle = @opendir($path); // Use error suppression instead of die()
+    if ( ! $folder_handle ) {
+        // Optionally log an error or return an empty array/WP_Error
+        error_log("Could not open directory: " . $path);
+        return array(); // Return empty array on failure
+    }
     $exclude_array = explode("|", $exclude);
     $result = array();
     while(false !== ($filename = readdir($folder_handle))) {
@@ -84,42 +89,39 @@ class Wp_StatsMechanic extends WP_Widget{
 
 
 ?>
-<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:','wp-statsmechanic');?> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo attribute_escape($title); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('font_color'); ?>"><?php _e('Font Color:','wp-statsmechanic');?> <input class="widefat" id="<?php echo $this->get_field_id('font_color'); ?>" name="<?php echo $this->get_field_name('font_color'); ?>" type="text" value="<?php echo $instance['font_color']; ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('title') ); ?>"><?php esc_html_e('Title:','wp-statsmechanic');?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id('title') ); ?>" name="<?php echo esc_attr( $this->get_field_name('title') ); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('font_color') ); ?>"><?php esc_html_e('Font Color:','wp-statsmechanic');?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id('font_color') ); ?>" name="<?php echo esc_attr( $this->get_field_name('font_color') ); ?>" type="text" value="<?php echo esc_attr( $instance['font_color'] ); ?>" /></label></p>
 <p><font size='2'><?php _e('To change the font color, fill the field with the HTML color code. example: #333','wp-statsmechanic');?> </font></p>
 <p><font size='2'><a href="https://www.adityasubawa.com/color-picker/" target="_blank"><?php _e('Click here</a> to select another color variation.', 'wp-statsmechanic');?></font></p>
 <p><font size='3'><b><?php _e('Widget Options', 'wp-statsmechanic');?></b></font></p>
 
-<p><label for="<?php echo $this->get_field_id('count_start'); ?>"><?php _e('Counter Start:','wp-statsmechanic');?> <input class="widefat" id="<?php echo $this->get_field_id('count_start'); ?>" name="<?php echo $this->get_field_name('count_start'); ?>" type="text" value="<?php echo $instance['count_start']; ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('count_start') ); ?>"><?php esc_html_e('Counter Start:','wp-statsmechanic');?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id('count_start') ); ?>" name="<?php echo esc_attr( $this->get_field_name('count_start') ); ?>" type="number" value="<?php echo esc_attr( $instance['count_start'] ); ?>" /></label></p>
 <p><font size='2'><?php _e('Fill in with numbers to start the initial calculation of the counter, if the empty counter will start from 1','wp-statsmechanic');?></font></p>
-<p><label for="<?php echo $this->get_field_id('hits_start'); ?>"><?php _e('Hits Start:','wp-statsmechanic');?> <input class="widefat" id="<?php echo $this->get_field_id('hits_start'); ?>" name="<?php echo $this->get_field_name('hits_start'); ?>" type="text" value="<?php echo $instance['hits_start']; ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('hits_start') ); ?>"><?php esc_html_e('Hits Start:','wp-statsmechanic');?> <input class="widefat" id="<?php echo esc_attr( $this->get_field_id('hits_start') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hits_start') ); ?>" type="number" value="<?php echo esc_attr( $instance['hits_start'] ); ?>" /></label></p>
 <p><font size='2'><?php _e('Fill in the numbers to start the initial calculation of the hits, if the empty hits will start from 1','wp-statsmechanic'); ?></font></p>
 
-<p><label for="<?php echo $this->get_field_id('count_length'); ?>"><?php _e('Image Counter Length:','wp-statsmechanic');?><select class="select" id="<?php echo $this->get_field_id('count_length'); ?>" name="<?php echo $this->get_field_name('count_length'); ?>" selected="<?php echo $instance['count_length']; ?>">
-		  <option value="<?php echo $instance['count_length']; ?>" selected><?php echo $instance['count_length']; ?></option>
-		  <option value="4">4</option>
-		  <option value="5">5</option>
-		  <option value="6">6</option>
-		  <option value="7">7</option>
+<p><label for="<?php echo esc_attr( $this->get_field_id('count_length') ); ?>"><?php esc_html_e('Image Counter Length:','wp-statsmechanic');?><select class="select" id="<?php echo esc_attr( $this->get_field_id('count_length') ); ?>" name="<?php echo esc_attr( $this->get_field_name('count_length') ); ?>">
+		  <?php foreach ( array('4', '5', '6', '7') as $length ) : ?>
+		  <option value="<?php echo esc_attr( $length ); ?>" <?php selected( $instance['count_length'], $length ); ?>><?php echo esc_html( $length ); ?></option>
+		  <?php endforeach; ?>
 		 </select></label></p>
 <p><font size='2'><?php _e('Define your Image counter length, the default length is 4','wp-statsmechanic');?></font></p>
 
-<p><label for="<?php echo $this->get_field_id('today_view'); ?>"><?php _e('Enable Visit Today display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['today_view'], 'on' ); ?> id="<?php echo $this->get_field_id('today_view'); ?>" name="<?php echo $this->get_field_name('today_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('yesterday_view'); ?>"><?php _e('Enable Visit Yesterday display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['yesterday_view'], 'on' ); ?> id="<?php echo $this->get_field_id('yesterday_view'); ?>" name="<?php echo $this->get_field_name('yesterday_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('month_view'); ?>"><?php _e('Enable Month display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['month_view'], 'on' ); ?> id="<?php echo $this->get_field_id('month_view'); ?>" name="<?php echo $this->get_field_name('month_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('year_view'); ?>"><?php _e('Enable Year display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['year_view'], 'on' ); ?> id="<?php echo $this->get_field_id('year_view'); ?>" name="<?php echo $this->get_field_name('year_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('total_view'); ?>"><?php _e('Enable Total Visit display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['total_view'], 'on' ); ?> id="<?php echo $this->get_field_id('total_view'); ?>" name="<?php echo $this->get_field_name('total_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('hits_view'); ?>"><?php _e('Enable Hits Today display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['hits_view'], 'on' ); ?> id="<?php echo $this->get_field_id('hits_view'); ?>" name="<?php echo $this->get_field_name('hits_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('totalhits_view'); ?>"><?php _e('Enable Total Hits display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['totalhits_view'], 'on' ); ?> id="<?php echo $this->get_field_id('totalhits_view'); ?>" name="<?php echo $this->get_field_name('totalhits_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('online_view'); ?>"><?php _e('Enable Whos Online display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['online_view'], 'on' ); ?> id="<?php echo $this->get_field_id('online_view'); ?>" name="<?php echo $this->get_field_name('online_view'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('ip_display'); ?>"><?php _e('Enable IP address display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['ip_display'], 'on' ); ?> id="<?php echo $this->get_field_id('ip_display'); ?>" name="<?php echo $this->get_field_name('ip_display'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('server_time'); ?>"><?php _e('Enable Server Time display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['server_time'], 'on' ); ?> id="<?php echo $this->get_field_id('server_time'); ?>" name="<?php echo $this->get_field_name('server_time'); ?>" /></label></p>
-<p><label for="<?php echo $this->get_field_id('statsmechanic_align'); ?>"><?php _e('Plugins align? ', 'wp-statsmechanic'); ?>
-		<select class="select" id="<?php echo $this->get_field_id('statsmechanic_align'); ?>" name="<?php echo $this->get_field_name('statsmechanic_align'); ?>" selected="<?php echo $instance['statsmechanic_align']; ?>">
-		  <option value="<?php echo $instance['statsmechanic_align']; ?>" selected><?php echo $instance['statsmechanic_align']; ?></option>
-		  <option value="Left">Left</option>
-		  <option value="Center">Center</option>
-		  <option value="Right">Right</option>
+<p><label for="<?php echo esc_attr( $this->get_field_id('today_view') ); ?>"><?php esc_html_e('Enable Visit Today display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['today_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('today_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('today_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('yesterday_view') ); ?>"><?php esc_html_e('Enable Visit Yesterday display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['yesterday_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('yesterday_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('yesterday_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('month_view') ); ?>"><?php esc_html_e('Enable Month display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['month_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('month_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('month_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('year_view') ); ?>"><?php esc_html_e('Enable Year display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['year_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('year_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('year_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('total_view') ); ?>"><?php esc_html_e('Enable Total Visit display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['total_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('total_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('total_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('hits_view') ); ?>"><?php esc_html_e('Enable Hits Today display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['hits_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('hits_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('hits_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('totalhits_view') ); ?>"><?php esc_html_e('Enable Total Hits display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['totalhits_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('totalhits_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('totalhits_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('online_view') ); ?>"><?php esc_html_e('Enable Whos Online display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['online_view'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('online_view') ); ?>" name="<?php echo esc_attr( $this->get_field_name('online_view') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('ip_display') ); ?>"><?php esc_html_e('Enable IP address display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['ip_display'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('ip_display') ); ?>" name="<?php echo esc_attr( $this->get_field_name('ip_display') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('server_time') ); ?>"><?php esc_html_e('Enable Server Time display? ', 'wp-statsmechanic'); ?><input type="checkbox" class="checkbox" <?php checked( $instance['server_time'], 'on' ); ?> id="<?php echo esc_attr( $this->get_field_id('server_time') ); ?>" name="<?php echo esc_attr( $this->get_field_name('server_time') ); ?>" /></label></p>
+<p><label for="<?php echo esc_attr( $this->get_field_id('statsmechanic_align') ); ?>"><?php esc_html_e('Plugins align? ', 'wp-statsmechanic'); ?>
+		<select class="select" id="<?php echo esc_attr( $this->get_field_id('statsmechanic_align') ); ?>" name="<?php echo esc_attr( $this->get_field_name('statsmechanic_align') ); ?>">
+		  <?php foreach ( array( 'Left', 'Center', 'Right' ) as $align_option ) : ?>
+		  <option value="<?php echo esc_attr( $align_option ); ?>" <?php selected( $instance['statsmechanic_align'], $align_option ); ?>><?php echo esc_html( $align_option ); ?></option>
+		  <?php endforeach; ?>
 		 </select></label></p>
 
 <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ZMEZEYTRBZP5N&lc=ID&item_name=Aditya%20Subawa&item_number=426267&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted" target="_blank"><img src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" alt="<?php _e('Donate', 'wp-statsmechanic') ?>" /></a></p>
@@ -137,7 +139,7 @@ class Wp_StatsMechanic extends WP_Widget{
 	
  
     if (!empty($title))
-      echo $before_title . $title . $after_title;
+      echo $before_title . esc_html( $title ) . $after_title; // Escape title
 
 	$ipaddress = isset($instance['ip_display']) ? $instance['ip_display'] : false ; // display ip address
 	$stime = isset($instance['server_time']) ? $instance['server_time'] : false ; // display server time
@@ -166,37 +168,85 @@ class Wp_StatsMechanic extends WP_Widget{
               $tglk=$tgl-1;  
 			  global $wpdb;
               // Check your IP, whether the user has had access to today's 
-              $sql = $wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE ip='$ip' AND tanggal='$tanggal'");
+              // Check your IP, whether the user has had access to today's
+              // Use prepare to prevent SQL injection
+              $check_sql = $wpdb->prepare(
+                  "SELECT ip FROM `" . BMW_TABLE_NAME . "` WHERE ip = %s AND tanggal = %s",
+                  $ip,
+                  $tanggal
+              );
+              $exists = $wpdb->get_var($check_sql);
+
               // If not there, save the user data to the database
-              if( $wpdb->get_results($sql) == 0){
-                $wpdb->query("INSERT INTO `". BMW_TABLE_NAME . "`(ip, tanggal, hits, online) VALUES('$ip','$tanggal','1','$waktu')");
-              } 
-              else{
-                 $wpdb->query("UPDATE `". BMW_TABLE_NAME . "` SET hits=hits+1, online='$waktu' WHERE ip='$ip' AND tanggal='$tanggal'");
+              if ( null === $exists ) {
+                  $wpdb->query( $wpdb->prepare(
+                      "INSERT INTO `" . BMW_TABLE_NAME . "` (ip, tanggal, hits, online) VALUES (%s, %s, %d, %s)",
+                      $ip,
+                      $tanggal,
+                      1, // hits start at 1
+                      $waktu
+                  ) );
+              } else {
+                  // If exists, update hits and online time
+                  $wpdb->query( $wpdb->prepare(
+                      "UPDATE `" . BMW_TABLE_NAME . "` SET hits = hits + 1, online = %s WHERE ip = %s AND tanggal = %s",
+                      $waktu,
+                      $ip,
+                      $tanggal
+                  ) );
               }
 			  //yesterday by ip
-			  if($tglk=='1' | $tglk=='2' | $tglk=='3' | $tglk=='4' | $tglk=='5' | $tglk=='6' | $tglk=='7' | $tglk=='8' | $tglk=='9'			){  
-    		  $kemarin1=$wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE tanggal='$thn-$bln-$tglk'");  
-     		  } else {  
-    		  $kemarin1=$wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE tanggal='$thn-$bln-$tglk'");  
-    		  }  
+			  // Construct yesterday's date string safely
+			  $yesterday_date = date('Y-m-d', strtotime('-1 day', strtotime($tanggal)));
+			  $kemarin1 = $wpdb->get_var( $wpdb->prepare(
+			   "SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "` WHERE tanggal = %s",
+			   $yesterday_date
+			  ) );
+			  // Ensure it's an integer
+			  $kemarin1 = absint($kemarin1);
 			  //this month by ip
-			  $bulan1=$wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE tanggal LIKE '%$blan%'");  
-    		  //this year by ip
-			  $tahunini1=$wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE tanggal LIKE '%$thn%'"); 
+			  $bulan1 = $wpdb->get_var( $wpdb->prepare(
+			   "SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "` WHERE tanggal LIKE %s",
+			   $wpdb->esc_like( $blan ) . '%' // Use esc_like for LIKE clauses
+			  ) );
+			  $bulan1 = absint($bulan1);
+
+			  	  //this year by ip
+			  $tahunini1 = $wpdb->get_var( $wpdb->prepare(
+			   "SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "` WHERE tanggal LIKE %s",
+			   $wpdb->esc_like( $thn ) . '%' // Use esc_like for LIKE clauses
+			  ) );
+			  $tahunini1 = absint($tahunini1);
 			  // visitor today by ip
-    		  $pengunjung       = $wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE tanggal='$tanggal' GROUP BY ip");
-			  // total visitor by ip
-              $totalpengunjung  = $wpdb->get_var("SELECT COUNT(hits) FROM `". BMW_TABLE_NAME . "`"); 
+    		  $pengunjung = $wpdb->get_var( $wpdb->prepare(
+    		"SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "` WHERE tanggal = %s",
+    		$tanggal
+    	) );
+    	$pengunjung = absint($pengunjung);
+
+    	// total unique visitors (distinct IPs ever)
+    		        $totalpengunjung = $wpdb->get_var( "SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "`" );
+    	$totalpengunjung = absint($totalpengunjung);
 			  // hits Today
-              $hits             = $wpdb->get_var("SELECT SUM(hits) FROM `". BMW_TABLE_NAME . "` WHERE tanggal='$tanggal' GROUP BY tanggal"); //masih gagal
-			  // total hits
-			  $totalhits        = $wpdb->get_var("SELECT SUM(hits) FROM `". BMW_TABLE_NAME . "`");  
+              $hits = $wpdb->get_var( $wpdb->prepare(
+      "SELECT SUM(hits) FROM `" . BMW_TABLE_NAME . "` WHERE tanggal = %s",
+      $tanggal
+     ) );
+     $hits = absint($hits); // Ensure it's an integer
+
+     // total hits
+     $totalhits = $wpdb->get_var( "SELECT SUM(hits) FROM `" . BMW_TABLE_NAME . "`" );
+     $totalhits = absint($totalhits); // Ensure it's an integer
 			  // unique visitor by ip
-			  $tothitsgbr      = $wpdb->get_var("SELECT COUNT(hits) FROM `". BMW_TABLE_NAME . "`"); 
+			  // Use total unique visitors for the image counter base
+			  $tothitsgbr = $totalpengunjung; // Use unique visitor count
               // whos online
 			  $bataswaktu       = time() - 300;
-              $pengunjungonline = $wpdb->query("SELECT * FROM `". BMW_TABLE_NAME . "` WHERE online > '$bataswaktu'");
+              $pengunjungonline = $wpdb->get_var( $wpdb->prepare(
+      "SELECT COUNT(DISTINCT ip) FROM `" . BMW_TABLE_NAME . "` WHERE online > %s",
+      $bataswaktu
+     ) );
+     $pengunjungonline = absint($pengunjungonline);
 			  $ext = ".gif";
 			 // image print
 			 // thnks to Jack All https://wordpress.org/support/profile/jack-all
@@ -210,7 +260,8 @@ class Wp_StatsMechanic extends WP_Widget{
 			  $tothitsstring = "";
 			  $arr = str_split($tothitsgbr);
 				foreach ($arr as $value) {
-					$tothitsstring = $tothitsstring . "<img src='". WP_PLUGIN_URL ."/mechanic-visitor-counter/styles/$style/$value$ext' alt='$value'>";
+					$image_url = plugins_url( "styles/$style/$value$ext", __FILE__ );
+					$tothitsstring .= "<img src='" . esc_url( $image_url ) . "' alt='" . esc_attr( $value ) . "'>";
 				}
 				$tothitsgbr = $tothitsstring;
 			}else{
@@ -218,92 +269,207 @@ class Wp_StatsMechanic extends WP_Widget{
 			  $tothitsstring = "";
 			  $arr = str_split($tothitsgbr);
 				foreach ($arr as $value) {
-					$tothitsstring = $tothitsstring . "<img src='". WP_PLUGIN_URL ."/mechanic-visitor-counter/styles/$style/$value$ext' alt='$value'>";
+					$image_url = plugins_url( "styles/$style/$value$ext", __FILE__ );
+					$tothitsstring .= "<img src='" . esc_url( $image_url ) . "' alt='" . esc_attr( $value ) . "'>";
 				}
 				$tothitsgbr = $tothitsstring;
 			  
 			}
 		     
 			   	    //image
-			  		$imgvisit= "<img src='".plugins_url ('counter/mvcvisit.png' , __FILE__ ). "'>";
-					$yesterday="<img src='".plugins_url ('counter/mvcyesterday.png' , __FILE__ ). "'>";
-					$month="<img src='".plugins_url ('counter/mvcmonth.png' , __FILE__ ). "'>";
-					$year="<img src='".plugins_url ('counter/mvcyear.png' , __FILE__ ). "'>";
-					$imgtotal="<img src='".plugins_url ('counter/mvctotal.png' , __FILE__ ). "'>";
-					$imghits="<img src='".plugins_url ('counter/mvctoday.png' , __FILE__ ). "'>";
-					$imgtotalhits="<img src='".plugins_url ('counter/mvctotalhits.png' , __FILE__ ). "'>";
-					$imgonline="<img src='" .plugins_url ('counter/mvconline.png' , __FILE__ ). "'>";
-					//style and widgetne
-					
-                    echo "<link rel='stylesheet' type='text/css' href='". WP_PLUGIN_URL ."/mechanic-visitor-counter/styles/css/default.css' />";
+			  		$imgvisit     = "<img src='" . esc_url( plugins_url( 'counter/mvcvisit.png', __FILE__ ) ) . "' alt=''>";
+			  $yesterday    = "<img src='" . esc_url( plugins_url( 'counter/mvcyesterday.png', __FILE__ ) ) . "' alt=''>";
+			  $month        = "<img src='" . esc_url( plugins_url( 'counter/mvcmonth.png', __FILE__ ) ) . "' alt=''>";
+			  $year         = "<img src='" . esc_url( plugins_url( 'counter/mvcyear.png', __FILE__ ) ) . "' alt=''>";
+			  $imgtotal     = "<img src='" . esc_url( plugins_url( 'counter/mvctotal.png', __FILE__ ) ) . "' alt=''>";
+			  $imghits      = "<img src='" . esc_url( plugins_url( 'counter/mvctoday.png', __FILE__ ) ) . "' alt=''>";
+			  $imgtotalhits = "<img src='" . esc_url( plugins_url( 'counter/mvctotalhits.png', __FILE__ ) ) . "' alt=''>";
+			  $imgonline    = "<img src='" . esc_url( plugins_url( 'counter/mvconline.png', __FILE__ ) ) . "' alt=''>";
+			  //style and widget
+
+			  		             // Enqueue style properly instead of echoing link tag
+			  		             wp_enqueue_style( 'statsmechanic-default-style', plugins_url( 'styles/css/default.css', __FILE__ ) );
 					?>
-<div id='mvcwid' style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'>
-	<div id="mvccount"><?php echo $tothitsgbr ?></div>
+<?php
+// Prepare inline styles safely
+$style_attr = '';
+if ( ! empty( $align ) ) {
+	$style_attr .= 'text-align:' . esc_attr( strtolower( $align ) ) . ';'; // Ensure lowercase for CSS
+}
+if ( ! empty( $fontcolor ) ) {
+	// Basic validation for hex color
+	if ( preg_match( '/^#([a-f0-9]{3}){1,2}$/i', $fontcolor ) ) {
+		$style_attr .= 'color:' . esc_attr( $fontcolor ) . ';';
+	}
+}
+// Add font-size inherit for better theme compatibility
+$style_attr .= 'font-size:inherit;';
+?>
+<div id='mvcwid' style='<?php echo $style_attr; ?>'>
+	<div id="mvccount"><?php echo $tothitsgbr; // Already contains img tags with escaped attrs ?></div>
 	<div id="mvctable">
         	<table width='100%'>
             <?php if ($todayview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $imgvisit ?> <?php _e('Visit Today :', 'wp-statsmechanic') ?> <?php echo $pengunjung ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $imgvisit; ?> <?php esc_html_e('Visit Today :', 'wp-statsmechanic'); ?> <?php echo esc_html( $pengunjung ); ?></td></tr>
             <?php } ?>
             <?php if ($yesview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $yesterday ?> <?php _e('Visit Yesterday :', 'wp-statsmechanic');?> <?php echo $kemarin1 ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $yesterday; ?> <?php esc_html_e('Visit Yesterday :', 'wp-statsmechanic');?> <?php echo esc_html( $kemarin1 ); ?></td></tr>
             <?php } ?>
             <?php if ($monthview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $month ?> <?php _e('This Month :', 'wp-statsmechanic'); ?> <?php echo $bulan1 ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $month; ?> <?php esc_html_e('This Month :', 'wp-statsmechanic'); ?> <?php echo esc_html( $bulan1 ); ?></td></tr>
             <?php } ?>
             <?php if ($yearview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $year ?> <?php _e('This Year :', 'wp-statsmechanic'); ?> <?php echo $tahunini1 ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $year; ?> <?php esc_html_e('This Year :', 'wp-statsmechanic'); ?> <?php echo esc_html( $tahunini1 ); ?></td></tr>
             <?php } ?>
 			<?php if ($totalview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $imgtotal ?> <?php _e('Total Visit :', 'wp-statsmechanic');?> <?php echo $totalpengunjung + $count_start ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $imgtotal; ?> <?php esc_html_e('Total Visit :', 'wp-statsmechanic');?> <?php echo esc_html( $totalpengunjung + $count_start ); ?></td></tr>
             <?php } ?>
             <?php if ($hitsview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $imghits ?> <?php _e('Hits Today :', 'wp-statsmechanic');?> <?php echo $hits ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $imghits; ?> <?php esc_html_e('Hits Today :', 'wp-statsmechanic');?> <?php echo esc_html( $hits ); ?></td></tr>
             <?php } ?>
             <?php if ($totalhitsview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $imgtotalhits ?> <?php _e('Total Hits :','wp-statsmechanic');?> <?php if ($hits_start==NULL) { 
-					echo $totalhits ;
-			}else{
-				$totalhitsfake = $totalhits + $hits_start;
-				echo $totalhitsfake;
-			}?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $imgtotalhits; ?> <?php esc_html_e('Total Hits :','wp-statsmechanic');?> <?php
+     $display_total_hits = $totalhits;
+     if ( $hits_start > 0 ) {
+      $display_total_hits += $hits_start;
+     }
+     echo esc_html( $display_total_hits );
+    ?></td></tr>
             <?php } ?>
             <?php if ($onlineview) { ?>
-            <tr><td style='font-size:2; text-align:<?php echo $align ?>;color:<?php echo $fontcolor ?>;'><?php echo $imgonline ?> <?php _e("Who's Online :", 'wp-statsmechanic');?> <?php echo $pengunjungonline ?></td></tr>
+            <tr><td style='<?php echo $style_attr; ?>'><?php echo $imgonline; ?> <?php esc_html_e("Who's Online :", 'wp-statsmechanic');?> <?php echo esc_html( $pengunjungonline ); ?></td></tr>
             <?php } ?>
             </table>
     	</div>
         <?php if ($ipaddress) { ?>
-        <div id="mvcip"><?php _e('Your IP Address:', 'wp-statsmechanic'); ?> <?php echo $ip ?></div>
+        <div id="mvcip"><?php esc_html_e('Your IP Address:', 'wp-statsmechanic'); ?> <?php echo esc_html( $ip ); ?></div>
         <?php } ?>
 		<?php if ($stime) { ?>
-        <div id="mvcserver"><?php _e('Server Time:', 'wp-statsmechanic'); ?> <?php echo $tanggal ?></div>
+        <div id="mvcserver"><?php esc_html_e('Server Time:', 'wp-statsmechanic'); ?> <?php echo esc_html( $tanggal ); ?></div>
         <?php } ?>
        
  </div> 
             <?php
 	echo $after_widget;
-  }}
+	 }
+	 
+	   /**
+	 * Sanitize widget form values as they are saved.
+	 *
+	 * @see WP_Widget::update()
+	 *
+	 * @param array $new_instance Values just sent to be saved.
+	 * @param array $old_instance Previously saved values from database.
+	 *
+	 * @return array Updated safe values to be saved.
+	 */
+	public function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		// Sanitize font color (basic hex check)
+		if ( preg_match( '/^#([a-f0-9]{3}){1,2}$/i', $new_instance['font_color'] ) ) {
+			$instance['font_color'] = $new_instance['font_color'];
+		} else {
+			$instance['font_color'] = ''; // Default or previous if invalid
+		}
+		$instance['count_start'] = isset( $new_instance['count_start'] ) ? absint( $new_instance['count_start'] ) : 0;
+		$instance['hits_start'] = isset( $new_instance['hits_start'] ) ? absint( $new_instance['hits_start'] ) : 0;
+		
+		// Sanitize count length
+		$allowed_lengths = array( '4', '5', '6', '7' );
+		$instance['count_length'] = isset( $new_instance['count_length'] ) && in_array( $new_instance['count_length'], $allowed_lengths, true ) ? $new_instance['count_length'] : '4';
+
+		$instance['today_view'] = isset( $new_instance['today_view'] ) ? 'on' : false;
+		$instance['yesterday_view'] = isset( $new_instance['yesterday_view'] ) ? 'on' : false;
+		$instance['month_view'] = isset( $new_instance['month_view'] ) ? 'on' : false;
+		$instance['year_view'] = isset( $new_instance['year_view'] ) ? 'on' : false;
+		$instance['total_view'] = isset( $new_instance['total_view'] ) ? 'on' : false;
+		$instance['hits_view'] = isset( $new_instance['hits_view'] ) ? 'on' : false;
+		$instance['totalhits_view'] = isset( $new_instance['totalhits_view'] ) ? 'on' : false;
+		$instance['online_view'] = isset( $new_instance['online_view'] ) ? 'on' : false;
+		$instance['ip_display'] = isset( $new_instance['ip_display'] ) ? 'on' : false;
+		$instance['server_time'] = isset( $new_instance['server_time'] ) ? 'on' : false;
+
+		// Sanitize alignment
+		$allowed_align = array( 'Left', 'Center', 'Right' );
+		$instance['statsmechanic_align'] = isset( $new_instance['statsmechanic_align'] ) && in_array( $new_instance['statsmechanic_align'], $allowed_align, true ) ? $new_instance['statsmechanic_align'] : 'Left';
+
+		return $instance;
+	}
+
+} // End class Wp_StatsMechanic
+
 add_action('widgets_init', 'register_wp_statsmechanic');
 // Shortcode
 // source: https://digwp.com/2010/04/call-widget-with-shortcode/
-function mvc_shortcode($atts) { 
- 
+/**
+ * Shortcode handler for [mechanic_visitor].
+ * Allows displaying the widget via shortcode with specific attribute overrides.
+ *
+ * Example: [mechanic_visitor title="Site Stats" font_color="#aabbcc"]
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string Widget output HTML.
+ */
+function mvc_shortcode( $atts ) {
     global $wp_widget_factory;
-    
-    extract(shortcode_atts(array(
-        'widget_name' => 'Wp_StatsMechanic',
-        'instance'    => ''
-    ), $atts));
-       
-    $widget_name = wp_specialchars($widget_name);
-    $instance = str_ireplace("&amp;", '&' ,$instance);
-    
+
+    // Define allowed attributes and their defaults
+    $atts = shortcode_atts(
+        array(
+            'title'      => '', // Default title is empty
+            'font_color' => '', // Default font color is empty (widget default will apply)
+            // Add other widget settings here if you want them configurable via shortcode
+            // e.g., 'today_view' => 'on', 'ip_display' => 'off', etc.
+            // Make sure to sanitize them below.
+        ),
+        $atts,
+        'mechanic_visitor' // Shortcode tag used for filtering attributes
+    );
+
+    // Prepare instance arguments for the widget, sanitizing attributes
+    $instance_args = array();
+
+    // Sanitize title
+    $instance_args['title'] = sanitize_text_field( $atts['title'] );
+
+    // Sanitize font color (allow empty or valid hex)
+    if ( ! empty( $atts['font_color'] ) && preg_match( '/^#([a-f0-9]{3}){1,2}$/i', $atts['font_color'] ) ) {
+        $instance_args['font_color'] = $atts['font_color'];
+    } else {
+        $instance_args['font_color'] = ''; // Use widget default if invalid/empty
+    }
+
+    // Note: Other widget settings will use their saved defaults unless added here.
+
+    $widget_name = 'Wp_StatsMechanic'; // The widget class name
+
+    // Check if the widget is registered
+    if ( ! is_a( $wp_widget_factory->widgets[ $widget_name ], 'WP_Widget' ) ) {
+        return ''; // Widget not found or invalid
+    }
+
     ob_start();
-    the_widget($widget_name, $instance, array('widget_id'=>'arbitrary-instance-'.$id,
+
+    // Generate a unique ID for the widget instance
+    $widget_id = 'mvc-shortcode-' . wp_rand( 1000, 9999 );
+
+    // Define arguments for the_widget call (no wrappers)
+    $widget_args = array(
+        'widget_id'     => $widget_id,
         'before_widget' => '',
-        'after_widget' => '',
-        'before_title' => '',
-        'after_title' => ''
+        'after_widget'  => '',
+        'before_title'  => '',
+        'after_title'   => '',
+    );
+
+    // Display the widget with the specified instance arguments and widget arguments
+    the_widget( $widget_name, $instance_args, $widget_args );
+
+    $output = ob_get_contents();
+    ob_end_clean();
+
+    return $output;
     ));
     $output = ob_get_contents();
     ob_end_clean();
@@ -315,10 +481,30 @@ function register_wp_statsmechanic() {
 register_widget('Wp_StatsMechanic', 'statsmechanic_style');
 }	
 //ADMIN OPTIONS
+/**
+ * Sanitize the style option value.
+ * Ensures it's in the format 'group/name' and contains safe characters.
+ */
+function statsmechanic_sanitize_style( $input ) {
+    // Basic sanitization, allows alphanumeric, slash, hyphen, underscore
+    $sanitized = preg_replace( '/[^a-zA-Z0-9\/_-]/', '', $input );
+    // Further validation could be added here to check if the path actually exists
+    // For now, just ensure basic format and characters.
+    if (strpos($sanitized, '/') !== false && !preg_match('/\.\./', $sanitized)) {
+         // Check if it looks like group/name and doesn't contain '..'
+        return $sanitized;
+    }
+    return ''; // Return empty or default if invalid
+}
+
 add_action('admin_menu', 'statsmechanic_menu');
 function statsmechanic_menu() {
-register_setting('plugin_statsmechanic_menu', 'statsmechanic_style');
-add_options_page('Plugin Stats Mechanic', 'Visitor Counter Options', 1, 'plugin_statsmechanic_menu', 'statsmechanic_options');
+    register_setting(
+        'plugin_statsmechanic_menu', // Option group
+        'statsmechanic_style',       // Option name
+        'statsmechanic_sanitize_style' // Sanitization callback
+    );
+    add_options_page('Plugin Stats Mechanic', 'Visitor Counter Options', 'manage_options', 'plugin_statsmechanic_menu', 'statsmechanic_options'); // Changed capability to manage_options
 }
 function statsmechanic_options() {
 if (!current_user_can('administrator'))  {
@@ -387,19 +573,20 @@ wp_die( __('You do not have sufficient permissions to access this page.') );
             foreach ($groups as $style_name => $style) {
 ?>
 					
- 					<p><b>Choose one of the <?php echo $style_name; ?> counter styles below:</b></p>
+ 					<p><b><?php printf( esc_html__( 'Choose one of the %s counter styles below:', 'wp-statsmechanic' ), esc_html( $style_name ) ); ?></b></p>
 						<table class="form-table">
 						<?php
                 foreach ($style as $name) {
                     ?>
                     	<tr>
                 		<td>
-                		<input type="radio" id="img1" name="statsmechanic_style" value="<?php echo $style_name . '/' . $name; ?>" <?php echo checked($style_name . '/' . $name, get_option ('statsmechanic_style')) ?> />
-                		<img src='<?php echo WP_PLUGIN_URL?>/mechanic-visitor-counter/styles/<?php echo $style_name . '/' . $name . '/'; ?>0.gif'>
-                		<img src='<?php echo WP_PLUGIN_URL?>/mechanic-visitor-counter/styles/<?php echo $style_name . '/' . $name . '/'; ?>1.gif'>
-                		<img src='<?php echo WP_PLUGIN_URL?>/mechanic-visitor-counter/styles/<?php echo $style_name . '/' . $name . '/'; ?>2.gif'>
-                		<img src='<?php echo WP_PLUGIN_URL?>/mechanic-visitor-counter/styles/<?php echo $style_name . '/' . $name . '/'; ?>3.gif'>
-                		<img src='<?php echo WP_PLUGIN_URL?>/mechanic-visitor-counter/styles/<?php echo $style_name . '/' . $name . '/'; ?>4.gif'>
+                		<?php $style_value = $style_name . '/' . $name; ?>
+                		<input type="radio" id="img-<?php echo esc_attr( $style_value ); ?>" name="statsmechanic_style" value="<?php echo esc_attr( $style_value ); ?>" <?php checked( $style_value, get_option('statsmechanic_style') ); ?> />
+                		<label for="img-<?php echo esc_attr( $style_value ); ?>">
+                		<?php for ( $i = 0; $i <= 4; $i++ ) : ?>
+                			<img src='<?php echo esc_url( plugins_url( "styles/{$style_name}/{$name}/{$i}.gif", __FILE__ ) ); ?>' alt='<?php echo esc_attr( $i ); ?>'>
+                		<?php endfor; ?>
+                		</label>
                 		</td>
                 	</tr>
 					  <?php
