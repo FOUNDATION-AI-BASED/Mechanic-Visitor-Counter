@@ -155,6 +155,10 @@ Plug-in is now compatible upto wordpress version 5.5
 
 Plug-in is now compatible upto wordpress version 5.5
 
+= 3.3.4 =
+1. update code to follow wordpress best practice.
+2. prepearing and testing plugin on wordpress 6.7.2
+
 
 == Arbitrary section ==
 
