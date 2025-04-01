@@ -1,5 +1,5 @@
 === Mechanic Visitor Counter ===
-Contributors: adityasubawa
+Contributors: adityasubawa, FOUNDATION-AI-BASED
 Donate link: https://www.adityasubawa.com/
 Tags: Visitor counter, visitor traffic, traffic statistics, traffic counter, blog stats, blog traffic, traffic count
 Requires at least: 4.5.3
