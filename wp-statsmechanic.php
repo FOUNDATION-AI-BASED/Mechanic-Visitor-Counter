@@ -470,12 +470,7 @@ function mvc_shortcode( $atts ) {
     ob_end_clean();
 
     return $output;
-    ));
-    $output = ob_get_contents();
-    ob_end_clean();
-    return $output;
- 
-} 
+}
 	add_shortcode('mechanic_visitor', 'mvc_shortcode');
 function register_wp_statsmechanic() {
 register_widget('Wp_StatsMechanic', 'statsmechanic_style');
